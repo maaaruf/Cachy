@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cachy", "Cachy\Cachy.csproj", "{635CDF14-3C46-4E59-B5C4-98D2C08A7B70}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cachy.WebApi", "Cachy.WebApi\Cachy.WebApi.csproj", "{5FD88101-A5BD-4562-83AE-3AABDE4D0486}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{635CDF14-3C46-4E59-B5C4-98D2C08A7B70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{635CDF14-3C46-4E59-B5C4-98D2C08A7B70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{635CDF14-3C46-4E59-B5C4-98D2C08A7B70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{635CDF14-3C46-4E59-B5C4-98D2C08A7B70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FD88101-A5BD-4562-83AE-3AABDE4D0486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FD88101-A5BD-4562-83AE-3AABDE4D0486}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FD88101-A5BD-4562-83AE-3AABDE4D0486}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FD88101-A5BD-4562-83AE-3AABDE4D0486}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {354E8FEC-1796-4C16-9062-ECC24FB38BF5}
+	EndGlobalSection
+EndGlobal
