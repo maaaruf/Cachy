@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using Cachy.DataTypes;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Text.Json;
 
@@ -8,39 +10,57 @@ public class CacheSet<T>
 {
     private readonly IDistributedCache _cache;
     private readonly ICacheKeyFactory<T> _keyFactory;
-    private readonly bool _hasGenerateSuffixMethod;
+    private readonly IList<MethodInfo> _suffixMethods;
+    private readonly IList<MethodInfo> _prefixMethods;
+    private readonly ILogger<CacheSet<T>> _logger;
 
-    public CacheSet(IDistributedCache cache, ICacheKeyFactory<T> keyFactory)
+    public CacheSet(IDistributedCache cache, ICacheKeyFactory<T> keyFactory, ILogger<CacheSet<T>> logger)
     {
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _keyFactory = keyFactory ?? throw new ArgumentNullException(nameof(keyFactory));
-        _hasGenerateSuffixMethod = Helpers.GetExtensionMethods(typeof(CacheSet<T>))
-            .Any(m => m.ReturnType == typeof(string) &&
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        var extendedMethods = Helpers.GetExtensionMethods(typeof(CacheSet<T>));
+        
+        _suffixMethods = extendedMethods.Where(m => m.ReturnType == typeof(Suffix) &&
                         m.GetParameters().Length > 0 &&
-                        m.GetParameters().Any(x => x.ParameterType == typeof(CacheSet<T>)));
+                        m.GetParameters().Any(x => x.ParameterType == typeof(CacheSet<T>))).ToList();
+
+        _prefixMethods = extendedMethods.Where(m => m.ReturnType == typeof(Suffix) &&
+                        m.GetParameters().Length > 0 &&
+                        m.GetParameters().Any(x => x.ParameterType == typeof(CacheSet<T>))).ToList();
     }
 
-    public async Task<T?> GetAsync(string? suffix, CancellationToken token = default)
+    public async Task<T?> GetAsync(Prefix prefix = default, Suffix suffix = default, CancellationToken token = default)
     {
-        var key = GetKey(suffix);
+        var key = GetKey(prefix, suffix);
+        _logger.LogInformation("Retrieving data with key: {Key}", key);
+
         var data = await _cache.GetStringAsync(key, token);
-        
+
         if (string.IsNullOrWhiteSpace(data))
+        {
+            _logger.LogWarning("No data found for key: {Key}", key);
             return default;
+        }
 
         return JsonSerializer.Deserialize<T>(data);
     }
 
-    public async Task SetAsync(string? suffix, T value, DistributedCacheEntryOptions? options = null)
+    public async Task SetAsync(T value, Prefix prefix = default, Suffix suffix = default, DistributedCacheEntryOptions? options = null)
     {
-        var key = GetKey(suffix);
+        var key = GetKey(prefix, suffix);
         ValidateValue(value);
 
         var json = JsonSerializer.Serialize(value);
+        _logger.LogInformation("Setting data with key: {Key}", key);
+
         if (options == null)
             await _cache.SetStringAsync(key, json);
         else
             await _cache.SetStringAsync(key, json, options);
+
+        _logger.LogInformation("Data set with key: {Key}", key);
     }
 
     private static void ValidateKey(string key)
@@ -55,14 +75,25 @@ public class CacheSet<T>
             throw new ArgumentNullException(nameof(value));
     }
 
-    protected string GetKey(string? suffix)
+    protected string GetKey(Prefix prefix, Suffix suffix)
     {
-        if (_hasGenerateSuffixMethod && string.IsNullOrWhiteSpace(suffix))
+        if (_suffixMethods.Any() && string.IsNullOrWhiteSpace(suffix.ToString()))
         {
-            throw new ArgumentException("Suffix is required for this cache");
+            var methodNames = string.Join(", ", _suffixMethods.Select(x => x.Name));
+            _logger.LogError("Prefix is required for this cache. Available methods to generate prefix: {Methods}", methodNames);
+
+            throw new ArgumentException("Prefix is required for this cache. Available methods to generate prefix: {Methods}", methodNames);
         }
 
-        var key = _keyFactory is not null ? _keyFactory.GenerateKey() : nameof(T);
+        if (_prefixMethods.Any() && string.IsNullOrWhiteSpace(prefix.ToString()))
+        {
+            var methodNames = string.Join(", ", _prefixMethods.Select(x => x.Name));
+            _logger.LogError("Prefix is required for this cache. Available methods to generate prefix: {Methods}", methodNames);
+
+            throw new ArgumentException("Prefix is required for this cache. Available methods to generate prefix: {Methods}", methodNames);
+        }
+
+        string key = _keyFactory != null ? _keyFactory.GenerateKey() : typeof(T).Name;
         key = $"{key}_{suffix}";
 
         ValidateKey(key);
