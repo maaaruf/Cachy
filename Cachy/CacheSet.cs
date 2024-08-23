@@ -14,22 +14,24 @@ public class CacheSet<T>
     {
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _keyFactory = keyFactory ?? throw new ArgumentNullException(nameof(keyFactory));
-        _hasGenerateSuffixMethod = _hasGenerateSuffixMethod = GetExtensionMethods(typeof(CacheSet<T>))
-                                       .Any(m => m.ReturnType == typeof(string) &&
-                                                 m.GetParameters().Length > 0 &&
-                                                 m.GetParameters().Any(x => x.ParameterType == typeof(CacheSet<T>)));
+        _hasGenerateSuffixMethod = Helpers.GetExtensionMethods(typeof(CacheSet<T>))
+            .Any(m => m.ReturnType == typeof(string) &&
+                        m.GetParameters().Length > 0 &&
+                        m.GetParameters().Any(x => x.ParameterType == typeof(CacheSet<T>)));
     }
 
-    public async Task<T?> GetAsync(string suffix = "")
+    public async Task<T?> GetAsync(string? suffix, CancellationToken token = default)
     {
         var key = GetKey(suffix);
-        var data = await _cache.GetStringAsync(key);
+        var data = await _cache.GetStringAsync(key, token);
+        
         if (string.IsNullOrWhiteSpace(data))
             return default;
+
         return JsonSerializer.Deserialize<T>(data);
     }
 
-    public async Task SetAsync(T value, string suffix = "" , DistributedCacheEntryOptions? options = null)
+    public async Task SetAsync(string? suffix, T value, DistributedCacheEntryOptions? options = null)
     {
         var key = GetKey(suffix);
         ValidateValue(value);
@@ -53,7 +55,7 @@ public class CacheSet<T>
             throw new ArgumentNullException(nameof(value));
     }
 
-    private string GetKey(string suffix)
+    protected string GetKey(string? suffix)
     {
         if (_hasGenerateSuffixMethod && string.IsNullOrWhiteSpace(suffix))
         {
@@ -65,31 +67,6 @@ public class CacheSet<T>
 
         ValidateKey(key);
 
-        return key;    
-    }
-
-    private static IEnumerable<MethodInfo> GetExtensionMethods(Type extendedType)
-    {
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-        foreach (var assembly in assemblies)
-        {
-            foreach (var type in assembly.GetTypes())
-            {
-                if (type.IsSealed && !type.IsGenericType && !type.IsNested)
-                {
-                    foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-                    {
-                        if (method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false))
-                        {
-                            var parameters = method.GetParameters();
-                            if (parameters.Length > 0 && parameters[0].ParameterType == extendedType)
-                            {
-                                yield return method;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        return key;
     }
 }
