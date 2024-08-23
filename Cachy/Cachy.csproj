@@ -1,12 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>1.0.0</Version>
+		<Authors>maaaruf</Authors>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>icon.png</PackageIcon>
+		<RepositoryUrl>https://github.com/maaaruf/Cachy</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>caching;memory;.net</PackageTags>
+		<PackageProjectUrl>https://github.com/maaaruf/Cachy</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<ReleaseNotes>Initial release with in-memory caching support.</ReleaseNotes>
+		<Description>
+			Cachy is a flexible caching library for .NET, supporting in-memory and distributed caching with easy integration. It features dynamic cache key generation, making it ideal for caching data based on custom criteria like user context. Perfect for managing complex caching needs in an organized way.
+		</Description>
+	</PropertyGroup>
 
-  <ItemGroup>
+
+	<ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
     <PackageReference Include="Scrutor" Version="4.2.2" />
   </ItemGroup>
