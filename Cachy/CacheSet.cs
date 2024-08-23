@@ -62,7 +62,7 @@ public class CacheSet<T>
             throw new ArgumentException("Suffix is required for this cache");
         }
 
-        var key = _keyFactory.GenerateKey();
+        var key = _keyFactory is not null ? _keyFactory.GenerateKey() : nameof(T);
         key = $"{key}_{suffix}";
 
         ValidateKey(key);
