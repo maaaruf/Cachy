@@ -14,11 +14,11 @@ public class CacheSet<T>
     private readonly IList<MethodInfo> _prefixMethods;
     private readonly ILogger<CacheSet<T>> _logger;
 
-    public CacheSet(IDistributedCache cache, ICacheKeyFactory<T> keyFactory, ILogger<CacheSet<T>> logger)
+    public CacheSet(IDistributedCache cache, ICacheKeyFactory<T> keyFactory, ILoggerFactory loggerFactory)
     {
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-        _keyFactory = keyFactory ?? throw new ArgumentNullException(nameof(keyFactory));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _keyFactory = keyFactory;
+        _logger = loggerFactory.CreateLogger<CacheSet<T>>();
 
         var extendedMethods = Helpers.GetExtensionMethods(typeof(CacheSet<T>));
         
@@ -34,13 +34,13 @@ public class CacheSet<T>
     public async Task<T?> GetAsync(Prefix prefix = default, Suffix suffix = default, CancellationToken token = default)
     {
         var key = GetKey(prefix, suffix);
-        _logger.LogInformation("Retrieving data with key: {Key}", key);
+        _logger?.LogInformation("Retrieving data with key: {Key}", key);
 
         var data = await _cache.GetStringAsync(key, token);
 
         if (string.IsNullOrWhiteSpace(data))
         {
-            _logger.LogWarning("No data found for key: {Key}", key);
+            _logger?.LogWarning("No data found for key: {Key}", key);
             return default;
         }
 
@@ -53,14 +53,14 @@ public class CacheSet<T>
         ValidateValue(value);
 
         var json = JsonSerializer.Serialize(value);
-        _logger.LogInformation("Setting data with key: {Key}", key);
+        _logger?.LogInformation("Setting data with key: {Key}", key);
 
         if (options == null)
             await _cache.SetStringAsync(key, json);
         else
             await _cache.SetStringAsync(key, json, options);
 
-        _logger.LogInformation("Data set with key: {Key}", key);
+        _logger?.LogInformation("Data set with key: {Key}", key);
     }
 
     private static void ValidateKey(string key)
@@ -79,18 +79,22 @@ public class CacheSet<T>
     {
         if (_suffixMethods.Any() && string.IsNullOrWhiteSpace(suffix.ToString()))
         {
-            var methodNames = string.Join(", ", _suffixMethods.Select(x => x.Name));
-            _logger.LogError("Prefix is required for this cache. Available methods to generate prefix: {Methods}", methodNames);
-
-            throw new ArgumentException("Prefix is required for this cache. Available methods to generate prefix: {Methods}", methodNames);
+            var methodNames = GetMethodNames(_suffixMethods);
+            
+            string message = $"Cache suffix is required for {typeof(T).Name}. Available methods to generate suffix: {methodNames}";
+            
+            _logger?.LogError(message);
+            throw new ArgumentException(message);
         }
 
         if (_prefixMethods.Any() && string.IsNullOrWhiteSpace(prefix.ToString()))
         {
-            var methodNames = string.Join(", ", _prefixMethods.Select(x => x.Name));
-            _logger.LogError("Prefix is required for this cache. Available methods to generate prefix: {Methods}", methodNames);
+            var methodNames = GetMethodNames(_prefixMethods);
 
-            throw new ArgumentException("Prefix is required for this cache. Available methods to generate prefix: {Methods}", methodNames);
+            string message = $"Prefix is required for this cache. Available methods to generate prefix: {methodNames}";
+            
+            _logger?.LogError(message);
+            throw new ArgumentException(message);
         }
 
         string key = _keyFactory != null ? _keyFactory.GenerateKey() : typeof(T).Name;
@@ -99,5 +103,11 @@ public class CacheSet<T>
         ValidateKey(key);
 
         return key;
+    }
+
+    private string GetMethodNames(IList<MethodInfo> methodInfos)
+    {
+        return string.Join(", ", methodInfos.Select(m =>
+            $"{m.Name}({string.Join(", ", m.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"))})"));
     }
 }
