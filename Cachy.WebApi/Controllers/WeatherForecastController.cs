@@ -1,3 +1,4 @@
+using Cachy.WebApi.Contexts;
 using Cachy.WebApi.Models.Cache;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -27,17 +28,19 @@ namespace Cachy.WebApi.Controllers
         {
             var balance = new BalanceCache
             {
-                Balance = 0,
+                Balance = new Random().Next(10, 100),
                 LastUpdated = DateTime.Now,
             };
 
             var suffix = _cacheContext.Balances.TestSuffix("Something", "userId");
-            await _cacheContext.Balances.SetAsync(balance, suffix);
+            var prefix = _cacheContext.Balances.GeneratePrefix("5");
+
+            await _cacheContext.Balances.SetAsync(balance, prefix, suffix);
 
             return Ok(balance);
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpGet(Name = "GetCache")]
         public async Task<BalanceCache> GetAsync()
         {
             var balance = new BalanceCache
@@ -46,8 +49,9 @@ namespace Cachy.WebApi.Controllers
                  LastUpdated = DateTime.UtcNow,
             };
 
+            var prefix = _cacheContext.Balances.GeneratePrefix("5");
             var suffix = _cacheContext.Balances.TestSuffix("Something", "userId");
-            var data = await _cacheContext.Balances.GetAsync();
+            var data = await _cacheContext.Balances.GetAsync(prefix, suffix);
 
             return data;
         }
