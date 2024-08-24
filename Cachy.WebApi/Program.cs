@@ -1,4 +1,6 @@
 
+using Cachy.WebApi.Contexts;
+
 namespace Cachy.WebApi
 {
     public class Program
@@ -16,6 +18,10 @@ namespace Cachy.WebApi
 
             //builder.Services.AddScoped<MyCacheContext>();
             builder.Services.AddCacheContext<MyCacheContext>();
+            //builder.Services.AddRedisCacheContext<MyRedisCacheContext>(options => {
+            //    options.Configuration = "redis-11265.c252.ap-southeast-1-1.ec2.redns.redis-cloud.com:11265,password=qzsXvAXiMo8M9mleD4kHwGlEmFevVCzN,defaultDatabase=1";
+            //    options.InstanceName = "test";
+            //});
 
             var app = builder.Build();
 
@@ -29,8 +35,6 @@ namespace Cachy.WebApi
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();
