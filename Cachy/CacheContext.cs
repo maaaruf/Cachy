@@ -21,11 +21,10 @@ public class CacheContext : MemoryDistributedCache
                 prop.PropertyType.GetGenericTypeDefinition() == typeof(CacheSet<>))
             {
                 var modelType = prop.PropertyType.GetGenericArguments()[0];
-                var cacheSet = Activator.CreateInstance(
-                    prop.PropertyType,
-                    serviceProvider.GetService(typeof(IDistributedCache)),
-                    serviceProvider.GetService(typeof(ICacheKeyFactory<>).MakeGenericType(modelType))
-                );
+                var cacheKeyFactory = serviceProvider.GetService(typeof(ICacheKeyFactory<>).MakeGenericType(modelType));
+                var cache = serviceProvider.GetService(typeof(IDistributedCache));
+
+                var cacheSet = Activator.CreateInstance(prop.PropertyType, cache, cacheKeyFactory, loggerFactory);
                 prop.SetValue(this, cacheSet);
             }
         }
