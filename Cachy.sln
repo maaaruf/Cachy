@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cachy", "Cachy\Cachy.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cachy.WebApi", "Cachy.WebApi\Cachy.WebApi.csproj", "{5FD88101-A5BD-4562-83AE-3AABDE4D0486}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cachy.StackExchangeRedis", "Cachy.StackExchangeRedis\Cachy.StackExchangeRedis.csproj", "{B42B6ABC-1C6D-45A8-9B40-7222D8102EF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5FD88101-A5BD-4562-83AE-3AABDE4D0486}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FD88101-A5BD-4562-83AE-3AABDE4D0486}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FD88101-A5BD-4562-83AE-3AABDE4D0486}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B42B6ABC-1C6D-45A8-9B40-7222D8102EF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B42B6ABC-1C6D-45A8-9B40-7222D8102EF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B42B6ABC-1C6D-45A8-9B40-7222D8102EF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B42B6ABC-1C6D-45A8-9B40-7222D8102EF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

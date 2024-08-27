@@ -1,4 +1,5 @@
 
+using Cachy.StackExchangeRedis;
 using Cachy.WebApi.Contexts;
 
 namespace Cachy.WebApi
@@ -17,10 +18,17 @@ namespace Cachy.WebApi
             builder.Services.AddSwaggerGen();
 
             //builder.Services.AddScoped<MyCacheContext>();
-            builder.Services.AddCacheContext<MyCacheContext>();
+
             //builder.Services.AddRedisCacheContext<MyRedisCacheContext>(options => {
             //    options.Configuration = "redis-11265.c252.ap-southeast-1-1.ec2.redns.redis-cloud.com:11265,password=qzsXvAXiMo8M9mleD4kHwGlEmFevVCzN,defaultDatabase=1";
             //    options.InstanceName = "test";
+            //});
+
+            builder.Services.AddCacheContext<MyCacheContext>();
+            //builder.Services.AddRedisCacheContext<MyCacheContext>(options =>
+            //{
+            //    options.Configuration = "redis-11265.c252.ap-southeast-1-1.ec2.redns.redis-cloud.com:11265,password=qzsXvAXiMo8M9mleD4kHwGlEmFevVCzN,defaultDatabase=1";
+            //    options.InstanceName = "SampleInstance";
             //});
 
             var app = builder.Build();
