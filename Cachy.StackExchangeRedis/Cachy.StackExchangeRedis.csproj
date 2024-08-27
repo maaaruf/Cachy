@@ -1,17 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>1.0.2</Version>
+		<Authors>maaaruf</Authors>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>assets\icon.png</PackageIcon>
+		<RepositoryUrl>https://github.com/maaaruf/Cachy</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>caching;memory;.net</PackageTags>
+		<PackageProjectUrl>https://github.com/maaaruf/Cachy</PackageProjectUrl>
+		<PackageReadmeFile>assets\README.md</PackageReadmeFile>
+		<ReleaseNotes>Initial release with in-memory caching support.</ReleaseNotes>
+		<Description>
+			Cachy.StackExchangeRedis is a flexible caching library for .NET, supporting in-memory and distributed caching with easy integration. Perfect for managing caching needs in an organized way.
+		</Description>
+	</PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Cachy" Version="1.0.2" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.8" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Cachy\Cachy.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="assets\icon.png" Pack="true" PackagePath="\" />
+		<None Update="assets\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
 </Project>
